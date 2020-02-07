@@ -1,0 +1,20 @@
+<script type="module">
+	import {Secp256k1Point, FQ} from './secp256_k1_curve.js'
+
+
+	const p = new Secp256k1Point(
+		new FQ(0x01), 
+        new FQ(0xbde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441)
+    );
+
+    console.log( p.is_well_defined() )
+
+	// console.log('test ', Secp256k1Point.G.multiply(Secp256k1Point.order).isZero() )
+
+	// for (let i=1; i<40;i++){
+	// 	const Q = P.multiply( BigInt(i)).multiply( (Secp256k1Point.order/2n) )
+	// 	console.log(Q.x,Q.y)
+	// }
+</script>
+
+
