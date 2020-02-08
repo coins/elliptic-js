@@ -1,5 +1,3 @@
-import { assert } from '../utils.js'
-
 // Abstract group of elliptic curve points
 export class CurvePoint {
 
@@ -62,7 +60,6 @@ export class CurvePoint {
         const l = y2.sub(y1).div(x2.sub(x1))
         const newx = l.mul(l).sub(x1).sub(x2)
         const newy = l.neg().mul(newx).add(l.mul(x1)).sub(y1)
-        assert(newy.eq((l.neg().mul(newx).add(l.mul(x2)).sub(y2))))
         return new this.constructor(newx, newy)
     }
 
