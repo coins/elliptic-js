@@ -2,64 +2,31 @@ import './jasmine-3.5.0/boot.js';
 
 // include source files here... 
 import './spec-helper.js';
-import { Player, Song } from '../elliptic.js';
+import { Secp256k1, FQ } from '../secp256k1/secp256k1.js';
 
 describe('elliptic', function() {
-    let player;
-    let song;
+    let curvePoint;
 
     beforeEach(function() {
-        player = new Player();
-        song = new Song();
+        curvePoint = new Secp256k1();
     });
 
-    //demonstrates use of expected exceptions
-    describe('#resume', function() {
-        it('should throw an exception if song is already playing', function() {
-            player.play(song);
-
-            expect(function() {
-                player.resume();
-            }).toThrowError('song is already playing');
+    describe('scalar multiplication', function() {
+        it('can be multiplied by a scalar', function() {
+            curvePoint.multiply(42n);
         });
     });
 
-    it('should be able to play a Song', function() {
-        player.play(song);
-        expect(player.currentlyPlayingSong).toEqual(song);
+    describe('points on the curve', function() {
+        it('are well defined', function() {
+            const p = new Secp256k1(
+                new FQ(0x01n),
+                new FQ(0xbde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441n)
+            );
 
-        //demonstrates use of custom matcher
-        expect(player).toBePlaying(song);
-    });
+            expect(p.is_well_defined()).toBeTrue();
 
-    describe('when song has been paused', function() {
-        beforeEach(function() {
-            player.play(song);
-            player.pause();
         });
-
-        it('should indicate that the song is currently paused', function() {
-            expect(player.isPlaying).toBeFalsy();
-
-            // demonstrates use of 'not' with a custom matcher
-            expect(player).not.toBePlaying(song);
-        });
-
-        it('should be possible to resume', function() {
-            player.resume();
-            expect(player.isPlaying).toBeTruthy();
-            expect(player.currentlyPlayingSong).toEqual(song);
-        });
-    });
-
-    // demonstrates use of spies to intercept and test method calls
-    it('tells the current song if the user has made it a favorite', function() {
-        spyOn(song, 'persistFavoriteStatus');
-
-        player.play(song);
-        player.makeFavorite();
-
-        expect(song.persistFavoriteStatus).toHaveBeenCalledWith(true);
     });
 
 });

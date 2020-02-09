@@ -1,10 +1,10 @@
-import { assert } from '../utils.js'
-
 // Abstract group of elliptic curve points
 export class CurvePoint {
 
     constructor(x, y, is_identity = false) {
-        if (is_identity) {
+        if (x === undefined) { // Return the default point aka the generator
+            this.P = this.constructor.G.P;
+        } else if (is_identity) {
             this._is_identity = true
         } else {
             this.P = [x, y]
@@ -38,7 +38,7 @@ export class CurvePoint {
 
     // Elliptic curve doubling
     double() {
-        const [x, y] = this.P
+        const [x, y] = this.P;
         const a = this.constructor.a || 0
         const l = x.pow(2n).mul(3n).add(a).div(y.mul(2n))
         const newx = l.pow(2n).sub(x.mul(2n))
@@ -62,7 +62,7 @@ export class CurvePoint {
         const l = y2.sub(y1).div(x2.sub(x1))
         const newx = l.mul(l).sub(x1).sub(x2)
         const newy = l.neg().mul(newx).add(l.mul(x1)).sub(y1)
-        assert(newy.eq((l.neg().mul(newx).add(l.mul(x2)).sub(y2))))
+        // assert(newy.eq((l.neg().mul(newx).add(l.mul(x2)).sub(y2))))
         return new this.constructor(newx, newy)
     }
 
