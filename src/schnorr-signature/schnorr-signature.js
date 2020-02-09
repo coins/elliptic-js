@@ -34,11 +34,11 @@ async function generateNonceRFC6979(message, privateKey, Hash) {
  */
 export function verify(message, signature, publicKey, Curve, Hash) {
     const { R, s } = signature;
-    const m = Buffer.concat(message, R);
+    const h = Buffer.toBigInt( Buffer.concat(message, R) );
 
     const S = Curve.G.multiply(s);
 
-    
-
     console.log(message, signature, publicKey, Curve, Hash)
+    return publicKey.multiply(h).add(R).equals(S)
+
 }

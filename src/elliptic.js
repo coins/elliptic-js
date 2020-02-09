@@ -1,11 +1,11 @@
 // Abstract group of elliptic curve points
 export class CurvePoint {
 
-    constructor(x, y, is_identity = false) {
+    constructor(x, y, isIdentity = false) {
         if (x === undefined) { // Return the default point aka the generator
             this.P = this.constructor.G.P;
-        } else if (is_identity) {
-            this._is_identity = true
+        } else if (isIdentity) {
+            this._isIdentity = true
         } else {
             this.P = [x, y]
         }
@@ -19,8 +19,8 @@ export class CurvePoint {
         return this.P[1]
     }
 
-    is_identity() {
-        return this._is_identity || false
+    isIdentity() {
+        return this._isIdentity || false
     }
 
     static identity() {
@@ -28,8 +28,8 @@ export class CurvePoint {
     }
 
     // Check that a point is on the curve defined by y**2 == x**3 + x*a + b
-    is_well_defined() {
-        if (this.is_identity())
+    isWellDefined() {
+        if (this.isIdentity())
             return true
         const [x, y] = this.P;
         const [a, b] = [this.constructor.a, this.constructor.b]
@@ -48,9 +48,9 @@ export class CurvePoint {
 
     // Elliptic curve addition
     add(other) {
-        if (this.is_identity())
+        if (this.isIdentity())
             return other
-        if (other.is_identity())
+        if (other.isIdentity())
             return this
         if (this.eq(other))
             return this.double()
@@ -62,13 +62,12 @@ export class CurvePoint {
         const l = y2.sub(y1).div(x2.sub(x1))
         const newx = l.mul(l).sub(x1).sub(x2)
         const newy = l.neg().mul(newx).add(l.mul(x1)).sub(y1)
-        // assert(newy.eq((l.neg().mul(newx).add(l.mul(x2)).sub(y2))))
         return new this.constructor(newx, newy)
     }
 
     // Convert P => -P
-    neg(pt) {
-        if (this.is_identity())
+    neg() {
+        if (this.isIdentity())
             return this
         return new this.constructor(this.x, this.y.neg())
     }
@@ -76,7 +75,7 @@ export class CurvePoint {
     // Elliptic curve point multiplication
     multiply(n) {
         n = BigInt(n)
-        if (this.is_identity())
+        if (this.isIdentity())
             return this
         if (n == 0n)
             return this.constructor.identity()
@@ -88,35 +87,33 @@ export class CurvePoint {
             return this.double().multiply(n / 2n).add(this)
     }
 
-    eq(other) {
-        return this.x.eq(other.x) && this.y.eq(other.y)
+    equals(other) {
+        return this.x.equals(other.x) && this.y.equals(other.y)
     }
 
-
-    compress(){
+    compress() {
         return this.x.n;
     }
 
-    // Computes y of x and returns P(x,y)
-    static decompress(x, flag){
-        x = new FieldElement(x);
-        let y = x.mul(x).mul(x).add(7).sqrt();
-        if(flag){
-            y = y.neg();
+    static decompress(x, flag) {
+        x = new this.prototype.constructor.FieldElement(x)
+        const b = this.prototype.constructor.b
+        const a = this.prototype.constructor.a
+        let y = x.pow(3n).add(x.mul(a)).add(b).sqrt()
+        if (!flag) {
+            y = y.neg()
         }
-        return new Secp256k1(x, y);
+        return this.prototype.constructor.fromPoint(x, y)
     }
 
-    static read(reader){
-        const flag = Uint8.read(reader);
-        const key = reader.readBytes(32);
-        switch(flag){
-            case 0x02:
-                return Secp256k1.decompress(key, true);
-            case 0x03:
-                return Secp256k1.decompress(key, false);
-            default:
-                throw Error('Incorrect Public Key encoding')
-        }
+    static fromPoint(x, y) {
+        x = new this.prototype.constructor.FieldElement(x)
+        y = new this.prototype.constructor.FieldElement(y)
+        return new this.prototype.constructor(x, y)
     }
+
+    static get FieldElement() {
+        throw 'Called abstract method';
+    }
+
 }
