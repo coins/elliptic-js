@@ -91,4 +91,32 @@ export class CurvePoint {
     eq(other) {
         return this.x.eq(other.x) && this.y.eq(other.y)
     }
+
+
+    compress(){
+        return this.x.n;
+    }
+
+    // Computes y of x and returns P(x,y)
+    static decompress(x, flag){
+        x = new FieldElement(x);
+        let y = x.mul(x).mul(x).add(7).sqrt();
+        if(flag){
+            y = y.neg();
+        }
+        return new Secp256k1(x, y);
+    }
+
+    static read(reader){
+        const flag = Uint8.read(reader);
+        const key = reader.readBytes(32);
+        switch(flag){
+            case 0x02:
+                return Secp256k1.decompress(key, true);
+            case 0x03:
+                return Secp256k1.decompress(key, false);
+            default:
+                throw Error('Incorrect Public Key encoding')
+        }
+    }
 }
