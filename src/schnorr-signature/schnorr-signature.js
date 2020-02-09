@@ -12,7 +12,7 @@ export async function sign(message, privateKey, Curve, Hash, generateNonce = gen
     const R = Buffer.fromBigInt(Curve.G.multiply(r).compress());
     const m = Buffer.concat(message, R);
     const h = Buffer.toBigInt(await Hash(m));
-    const s = (r + h * privateKey) % (Curve.modulus - 1n);
+    const s = (r + h * privateKey) % Curve.order;
     return { R, s }
 }
 
@@ -32,13 +32,16 @@ async function generateNonceRFC6979(message, privateKey, Hash) {
  * @param {Uint8Array} publicKey - The public key.
  * @return {ArrayBuffer} - The signature
  */
-export function verify(message, signature, publicKey, Curve, Hash) {
-    const { R, s } = signature;
-    const h = Buffer.toBigInt( Buffer.concat(message, R) );
+export async function verify(message, signature, publicKey, Curve, Hash) {
+    let { R, s } = signature;
+    const m = Buffer.concat(message, R) ;
+    const h = Buffer.toBigInt(await Hash(m));
+
 
     const S = Curve.G.multiply(s);
 
-    console.log(message, signature, publicKey, Curve, Hash)
+    R = Curve.decompress(Buffer.toBigInt(R))
+    console.log(message, signature, publicKey)
     return publicKey.multiply(h).add(R).equals(S)
 
 }
