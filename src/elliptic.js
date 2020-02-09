@@ -116,4 +116,8 @@ export class CurvePoint {
         throw 'Called abstract method';
     }
 
+    static get order() {
+        throw 'Called abstract method';
+    }
+
 }

@@ -29,10 +29,6 @@ export class Secp256k1 extends CurvePoint {
         )
     }
 
-    static get modulus(){
-        return secp256k1_p;
-    }
-
     static get FieldElement(){
         return FQ
     }
