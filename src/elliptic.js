@@ -113,11 +113,11 @@ export class CurvePoint {
     }
 
     static get FieldElement() {
-        throw 'Called abstract method';
+        throw 'Error: abstract method!';
     }
 
     static get order() {
-        throw 'Called abstract method';
+        throw 'Error: abstract method!';
     }
 
 }
