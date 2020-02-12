@@ -40,7 +40,6 @@ export async function verify(message, signature, publicKey, Curve, Hash) {
     const S = Curve.G.multiply(s);
 
     R = Curve.decompress(R)
-    console.log(message, signature, publicKey)
     return publicKey.multiply(h).add(R).equals(S)
 
 }
