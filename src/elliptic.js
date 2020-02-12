@@ -24,7 +24,7 @@ export class CurvePoint {
     }
 
     static identity() {
-        return new this.prototype.constructor(null, null, true);
+        return new this.constructor(null, null, true);
     }
 
     // Check that a point is on the curve defined by y**2 == x**3 + x*a + b
@@ -96,20 +96,20 @@ export class CurvePoint {
     }
 
     static decompress(x, flag) {
-        x = new this.prototype.constructor.FieldElement(x)
-        const b = this.prototype.constructor.b
-        const a = this.prototype.constructor.a
+        x = new this.CURVE.FieldElement(x)
+        const b = this.CURVE.b
+        const a = this.CURVE.a
         let y = x.pow(3n).add(x.mul(a)).add(b).sqrt()
         if (!flag) {
             y = y.neg()
         }
-        return this.prototype.constructor.fromPoint(x, y)
+        return this.CURVE.fromPoint(x, y)
     }
 
     static fromPoint(x, y) {
-        x = new this.prototype.constructor.FieldElement(x)
-        y = new this.prototype.constructor.FieldElement(y)
-        return new this.prototype.constructor(x, y)
+        x = new this.CURVE.FieldElement(x)
+        y = new this.CURVE.FieldElement(y)
+        return new this.CURVE(x, y)
     }
 
     static get FieldElement() {
@@ -120,4 +120,7 @@ export class CurvePoint {
         throw 'Error: abstract method!';
     }
 
+    static get CURVE() {
+        return this.prototype.constructor
+    }
 }

@@ -1,12 +1,10 @@
-import './jasmine-3.5.0/boot.js';
-
-// include source files here... 
 import { Secp256k1 } from '../secp256k1/secp256k1.js';
-import { sign, verify } from '../schnorr-signature/schnorr-signature.js';
+import * as Schnorr from '../schnorr-signature/schnorr-signature.js';
+import * as ECDSA from '../ecdsa-signature/ecdsa-signature.js';
 import * as Buffer from '../../../buffer-js/src/buffer-utils.js';
 import { sha256 } from '../../../hash-js/src/sha.js';
 
-describe('elliptic', function() {
+describe('Secp256k1', function() {
 
     describe('Points on the curve', function() {
 
@@ -16,7 +14,7 @@ describe('elliptic', function() {
                 115136800820456833737994126771386015026287095034625623644186278108926690779567n,
                 3479535755779840016334846590594739014278212596066547564422106861430200972724n
             )
-            expect( P.equals(Q) ).toBeTrue()
+            expect(P.equals(Q)).toBeTrue()
         });
 
         it('are well defined', function() {
@@ -42,16 +40,26 @@ describe('elliptic', function() {
 
     });
 
-});
-
-
-describe('Schnorr Signatures', function() {
-    it('can be multiplied by a scalar', async function() {
-        const privateKey = 42n;
-        const publicKey = Secp256k1.G.multiply(privateKey);
-        const message = Buffer.fromUnicode('abc');
-        const signature = await sign(message, privateKey, Secp256k1, sha256);
-        const result = await verify(message, signature, publicKey, Secp256k1, sha256);
-        expect(result).toBeTrue()
+    describe('Schnorr Signatures', function() {
+        it('can sign and verify a message', async function() {
+            const privateKey = 42n;
+            const publicKey = Secp256k1.G.multiply(privateKey);
+            const message = Buffer.fromUnicode('abc');
+            const signature = await Schnorr.sign(message, privateKey, Secp256k1, sha256);
+            const result = await Schnorr.verify(message, signature, publicKey, Secp256k1, sha256);
+            expect(result).toBeTrue()
+        });
     });
+
+    describe('ECDSA Signatures', function() {
+        it('can sign and verify a message', async function() {
+            const privateKey = 42n;
+            const publicKey = Secp256k1.G.multiply(privateKey);
+            const message = Buffer.fromUnicode('abc');
+            const signature = await ECDSA.sign(message, privateKey, Secp256k1, sha256);
+            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, sha256);
+            expect(result).toBeTrue()
+        });
+    });
+
 });
