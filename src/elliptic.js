@@ -100,17 +100,17 @@ export class CurvePoint {
         const x = this.x;
         const a = this.constructor.a
         const b = this.constructor.b
-        const isEvenY = this.y !== x.pow(3n).add(x.mul(a)).add(b).sqrt()
+        const isEvenY = this.y.n !== x.pow(3n).add(x.mul(a)).add(b).sqrt().n
         return isEvenY
     }
 
     compress() {
-        const isEven = this.isEven ? '02' : '01'
+        const isEven = this.isEven() ? '02' : '01'
         return Buffer.fromHex(isEven + this.toHex())
     }
 
     static decompress(compressed) {
-        const isEven = compressed.slice(0, 1)
+        const isEven = compressed.slice(0, 1)[0] === 2
         const x_int = compressed.slice(1).toBigInt()
         const x = new this.CURVE.FieldElement(x_int)
         const a = this.CURVE.a
