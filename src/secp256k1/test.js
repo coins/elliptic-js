@@ -1,7 +1,7 @@
 import { Secp256k1 } from '../secp256k1/secp256k1.js';
 import * as Schnorr from '../schnorr-signature/schnorr-signature.js';
 import * as ECDSA from '../ecdsa-signature/ecdsa-signature.js';
-import * as Buffer from '../../../buffer-js/src/buffer-utils.js';
+import * as Buffer from '../../../buffer-js/src/buffer-utils/buffer-utils.js';
 import { SHA256 } from '../../../hash-js/hash.js';
 
 describe('Secp256k1', function() {

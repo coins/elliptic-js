@@ -1,4 +1,4 @@
-import * as Buffer from '../../../buffer-js/src/buffer-utils.js'
+import * as Buffer from '../../../buffer-js/src/buffer-utils/buffer-utils.js'
 
 /**
  * Sign a message with a private key.
