@@ -11,18 +11,18 @@ export async function sign(message, privateKey, Curve, Hash, generateNonce = gen
     const r = await generateNonce(message, privateKey, Hash);
     const R = Curve.G.multiply(r).compress();
     const m = Buffer.concat(message, R);
-    const h = Buffer.toBigInt(await Hash(m));
+    const h = (await Hash.hash(m)).toBigInt()
     const s = (r + h * privateKey) % Curve.order;
     return { R, s }
 }
-
 
 /** An implementation of RFC6979 (using HMAC-SHA256) as nonce generation function.
  * https://tools.ietf.org/html/rfc6979
  */
 async function generateNonceRFC6979(message, privateKey, Hash) {
     const m = Buffer.concat(message, Buffer.fromBigInt(privateKey));
-    return Buffer.toBigInt(await Hash(m));
+    const hash = await Hash.hash(m)
+    return hash.toBigInt();
 }
 
 /**
@@ -34,8 +34,8 @@ async function generateNonceRFC6979(message, privateKey, Hash) {
  */
 export async function verify(message, signature, publicKey, Curve, Hash) {
     let { R, s } = signature;
-    const m = Buffer.concat(message, R);
-    const h = Buffer.toBigInt(await Hash(m));
+    const m = Buffer.concat(message, R) ;
+    const h = (await Hash.hash(m)).toBigInt()
 
     const S = Curve.G.multiply(s);
 
