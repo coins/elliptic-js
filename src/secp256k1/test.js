@@ -6,6 +6,12 @@ import { sha256 } from '../../../hash-js/hash.js';
 
 describe('Secp256k1', function() {
 
+    it('can generate a public key', function() {
+        const privateKey = BigInt('0x18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725')
+        const publicKey = Secp256k1.publicKey(privateKey)
+        expect(publicKey.toHex()).toBe(('0250863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b2352'))
+    });
+
     describe('Points on the curve', function() {
 
         it('can be multiplied by a scalar', function() {

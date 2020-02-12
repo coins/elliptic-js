@@ -9,7 +9,7 @@ import * as Buffer from '../../../buffer-js/src/buffer-utils.js'
  */
 export async function sign(message, privateKey, Curve, Hash, generateNonce = generateNonceRFC6979) {
     const r = await generateNonce(message, privateKey, Hash);
-    const R = Buffer.fromBigInt(Curve.G.multiply(r).compress());
+    const R = Curve.G.multiply(r).compress();
     const m = Buffer.concat(message, R);
     const h = Buffer.toBigInt(await Hash(m));
     const s = (r + h * privateKey) % Curve.order;
@@ -34,12 +34,12 @@ async function generateNonceRFC6979(message, privateKey, Hash) {
  */
 export async function verify(message, signature, publicKey, Curve, Hash) {
     let { R, s } = signature;
-    const m = Buffer.concat(message, R) ;
+    const m = Buffer.concat(message, R);
     const h = Buffer.toBigInt(await Hash(m));
 
     const S = Curve.G.multiply(s);
 
-    R = Curve.decompress(Buffer.toBigInt(R))
+    R = Curve.decompress(R)
     console.log(message, signature, publicKey)
     return publicKey.multiply(h).add(R).equals(S)
 

@@ -1,3 +1,4 @@
+import { Buffer } from '../../buffer-js/buffer.js'
 // Abstract group of elliptic curve points
 export class CurvePoint {
 
@@ -91,16 +92,31 @@ export class CurvePoint {
         return this.x.equals(other.x) && this.y.equals(other.y)
     }
 
-    compress() {
-        return this.x.n;
+    toHex() {
+        return this.x.n.toString(16)
     }
 
-    static decompress(x, flag) {
-        x = new this.CURVE.FieldElement(x)
-        const b = this.CURVE.b
+    isEven(){
+        const x = this.x;
+        const a = this.constructor.a
+        const b = this.constructor.b
+        const isEvenY = this.y !== x.pow(3n).add(x.mul(a)).add(b).sqrt()
+        return isEvenY
+    }
+
+    compress() {
+        const isEven = this.isEven ? '02' : '01'
+        return Buffer.fromHex(isEven + this.toHex())
+    }
+
+    static decompress(compressed) {
+        const isEven = compressed.slice(0, 1)
+        const x_int = compressed.slice(1).toBigInt()
+        const x = new this.CURVE.FieldElement(x_int)
         const a = this.CURVE.a
+        const b = this.CURVE.b
         let y = x.pow(3n).add(x.mul(a)).add(b).sqrt()
-        if (!flag) {
+        if (isEven) {
             y = y.neg()
         }
         return this.CURVE.fromPoint(x, y)
@@ -122,5 +138,9 @@ export class CurvePoint {
 
     static get CURVE() {
         return this.prototype.constructor
+    }
+
+    static publicKey(privateKey) {
+        return this.G.multiply(privateKey).compress()
     }
 }
