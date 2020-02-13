@@ -48,23 +48,33 @@ describe('Secp256k1', function() {
     })
 
     describe('ECDSA Signatures', function() {
+
         it('can sign and verify a message', async function() {
-            const privateKey = 42n;
+            const privateKey = 42n
             const publicKey = Secp256k1.publicKey(privateKey)
             const message = Buffer.fromUnicode('abc')
-            const signature = await ECDSA.sign(message, privateKey, Secp256k1, SHA256d);
-            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, SHA256d);
+            const signature = await ECDSA.sign(message, privateKey, Secp256k1, SHA256d)
+            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, SHA256d)
             expect(result).toBeTrue()
+        })
+
+        it('can sign and verify like bitcoin', async function(){
+            const privateKey = 1n
+            const message = Buffer.fromUnicode('Satoshi Nakamoto')
+            const generateNonce = _ => BigInt('0x8F8A276C19F4149656B280621E358CCE24F5F52542772691EE69063B74F15D15')
+            const signature = await ECDSA.sign(message, privateKey, Secp256k1, SHA256d, generateNonce)
+            expect(signature.r).toBe(66622713665624427733710315200720396955896638749566533714623508373930515555288n)
+            expect(signature.s).toBe(104547365282402277427930334588853961202488080074579832666060404000093909658466n)
         })
     })
 
     describe('Schnorr Signatures', function() {
         it('can sign and verify a message', async function() {
-            const privateKey = 42n;
+            const privateKey = 42n
             const publicKey = Secp256k1.publicKey(privateKey)
-            const message = Buffer.fromUnicode('abc');
-            const signature = await Schnorr.sign(message, privateKey, Secp256k1, SHA256d);
-            const result = await Schnorr.verify(message, signature, publicKey, Secp256k1, SHA256d);
+            const message = Buffer.fromUnicode('abc')
+            const signature = await Schnorr.sign(message, privateKey, Secp256k1, SHA256d)
+            const result = await Schnorr.verify(message, signature, publicKey, Secp256k1, SHA256d)
             expect(result).toBeTrue()
         })
     })
