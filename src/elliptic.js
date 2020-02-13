@@ -100,8 +100,8 @@ export class CurvePoint {
         const x = this.x;
         const a = this.constructor.a
         const b = this.constructor.b
-        const isEvenY = this.y.n !== x.pow(3n).add(x.mul(a)).add(b).sqrt().n
-        return isEvenY
+        const isEven = this.y.n !== x.pow(3n).add(x.mul(a)).add(b).sqrt().n
+        return isEven
     }
 
     compress() {
