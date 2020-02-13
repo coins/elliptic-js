@@ -36,7 +36,7 @@ export class Secp256k1 extends CurvePoint {
 
     /**
      * The generator curve point.
-     * @return 
+     * @return {Secp256k1}
      */
     static get G() {
         return Secp256k1.fromPoint(
@@ -51,3 +51,11 @@ export class Secp256k1 extends CurvePoint {
      */
     static get FieldElement() { return FQ }
 }
+
+
+// TODO: Create curve point factory to generate class from more simple config files 
+// containing only (p, order, a, b, G.x, G.y) per curve
+
+
+
+
