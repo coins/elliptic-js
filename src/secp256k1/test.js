@@ -6,7 +6,7 @@ import { Secp256k1 } from '../secp256k1/secp256k1.js';
 import * as Schnorr from '../signatures/schnorr-signature.js';
 import * as ECDSA from '../signatures/ecdsa-signature.js';
 import { Buffer } from '../../../buffer-js/buffer.js';
-import { SHA256 } from '../../../hash-js/hash.js';
+import { SHA256d } from '../../../hash-js/hash.js';
 
 describe('Secp256k1', function() {
 
@@ -52,8 +52,8 @@ describe('Secp256k1', function() {
             const privateKey = 42n;
             const publicKey = Secp256k1.publicKey(privateKey)
             const message = Buffer.fromUnicode('abc')
-            const signature = await ECDSA.sign(message, privateKey, Secp256k1, SHA256);
-            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, SHA256);
+            const signature = await ECDSA.sign(message, privateKey, Secp256k1, SHA256d);
+            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, SHA256d);
             expect(result).toBeTrue()
         })
     })
@@ -63,8 +63,8 @@ describe('Secp256k1', function() {
             const privateKey = 42n;
             const publicKey = Secp256k1.publicKey(privateKey)
             const message = Buffer.fromUnicode('abc');
-            const signature = await Schnorr.sign(message, privateKey, Secp256k1, SHA256);
-            const result = await Schnorr.verify(message, signature, publicKey, Secp256k1, SHA256);
+            const signature = await Schnorr.sign(message, privateKey, Secp256k1, SHA256d);
+            const result = await Schnorr.verify(message, signature, publicKey, Secp256k1, SHA256d);
             expect(result).toBeTrue()
         })
     })

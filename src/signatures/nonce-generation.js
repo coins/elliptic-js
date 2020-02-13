@@ -1,5 +1,20 @@
 import { hmac_sha256 } from '../../../hash-js/hash.js'
-import { concat, fromBigInt, toBigInt } from '../../../buffer-js/buffer.js'
+import { concat, fromBigInt, toBigInt, randomBytes } from '../../../buffer-js/buffer.js'
+
+/**
+ * Generates a random nonce for a signature.
+ * @param  {Curve} - The class of curve points.
+ * @return {BigInt} - A random nonce.
+ */
+export async function generateRandomNonce(Curve) {
+    let nonce = toBigInt(randomBytes(32))
+    // The nonce must be a field element
+    while (nonce > Curve.FieldElement.order) {
+        // If it is too big, we generate another one
+        nonce = toBigInt(randomBytes(32))
+    }
+    return nonce
+}
 
 /**
  * An implementation of RFC6979 (using HMAC-SHA256) as nonce generation function.
@@ -15,7 +30,7 @@ export async function generateNonceRFC6979(message, privateKey, hmac = hmac_sha2
     return toBigInt(nonce)
 }
 
-// TODO: actually implement this...
+// TODO: actually implement RFC6979...
 
 /*
 

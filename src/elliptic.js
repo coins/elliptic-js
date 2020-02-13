@@ -25,7 +25,7 @@ export class CurvePoint {
     }
 
     static identity() {
-        return new this.constructor(null, null, true);
+        return new this.prototype.constructor(null, null, true);
     }
 
     // Check that a point is on the curve defined by y**2 == x**3 + x*a + b
