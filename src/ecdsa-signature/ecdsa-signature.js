@@ -44,3 +44,5 @@ export async function verify(message, signature, publicKey, Curve, Hash) {
     return publicKey.multiply(h).add(R).equals(S)
 
 }
+
+
