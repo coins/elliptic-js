@@ -47,7 +47,11 @@ export class CurvePoint {
         return new this.constructor(newx, newy)
     }
 
-    // Elliptic curve addition
+    /**
+     * Add an other point to this one.
+     * @param {CurvePoint} other - The other point
+     * @return {CurvePoint} - The sum of the two points
+     */
     add(other) {
         if (this.isIdentity())
             return other
@@ -80,9 +84,9 @@ export class CurvePoint {
             return this
         if (n == 0n)
             return this.constructor.identity()
-        else if (n == 1n) // FIXME compare to field elements
+        else if (n == 1n)
             return this
-        else if (n % 2n === 0n) // FIXME compare to field elements
+        else if (n % 2n === 0n)
             return this.double().multiply(n / 2n)
         else
             return this.double().multiply(n / 2n).add(this)
@@ -92,11 +96,7 @@ export class CurvePoint {
         return this.x.equals(other.x) && this.y.equals(other.y)
     }
 
-    toHex() {
-        return this.x.n.toString(16)
-    }
-
-    isEven(){
+    isEven() {
         const x = this.x;
         const a = this.constructor.a
         const b = this.constructor.b
@@ -104,13 +104,20 @@ export class CurvePoint {
         return isEven
     }
 
+    /**
+     * Compress this point.
+     * The compressed point is the x-coordinate
+     * proceeded by a byte encoding the orientation of the y-coordinate.
+     * 
+     * @return {Buffer}
+     */
     compress() {
         const isEven = this.isEven() ? '02' : '01'
-        return Buffer.fromHex(isEven + this.toHex())
+        return Buffer.fromHex(isEven + this.x.toHex())
     }
 
     static decompress(compressed) {
-        const isEven = compressed.slice(0, 1)[0] === 2
+        const isEven = parseOrientationByte(compressed)
         const x_int = compressed.slice(1).toBigInt()
         const x = new this.CURVE.FieldElement(x_int)
         const a = this.CURVE.a
@@ -142,5 +149,17 @@ export class CurvePoint {
 
     static publicKey(privateKey) {
         return this.G.multiply(privateKey).compress()
+    }
+}
+
+function parseOrientationByte(compressed) {
+    const orientation = compressed.slice(0, 1)[0]
+    switch (orientation) {
+        case 1:
+            return false
+        case 2:
+            return false
+        default:
+            throw Error('Malformed orientation byte')
     }
 }

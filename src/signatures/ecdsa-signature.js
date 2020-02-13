@@ -1,4 +1,5 @@
-import * as Buffer from '../../../buffer-js/src/buffer-utils/buffer-utils.js'
+import { concat } from '../../../buffer-js/buffer.js'
+import { generateNonceRFC6979 } from './nonce-generation.js'
 
 /**
  * Sign a message with a private key.
@@ -8,21 +9,14 @@ import * as Buffer from '../../../buffer-js/src/buffer-utils/buffer-utils.js'
  * @return {ArrayBuffer} - The signature
  */
 export async function sign(message, privateKey, Curve, Hash, generateNonce = generateNonceRFC6979) {
-    const r = await generateNonce(message, privateKey, Hash)
+    const r = await generateNonce(message, privateKey) 
     const R = Curve.G.multiply(r).compress()
-    const m = Buffer.concat(message, R)
+
+    const m = concat(message, R)
     const h = (await Hash.hash(m)).toBigInt()
+
     const s = (r + h * privateKey) % Curve.order
     return { R, s }
-}
-
-/** An implementation of RFC6979 (using HMAC-SHA256) as nonce generation function.
- * https://tools.ietf.org/html/rfc6979
- */
-async function generateNonceRFC6979(message, privateKey, Hash) {
-    const m = Buffer.concat(message, Buffer.fromBigInt(privateKey))
-    const hash = await Hash.hash(m)
-    return hash.toBigInt();
 }
 
 /**
@@ -34,13 +28,15 @@ async function generateNonceRFC6979(message, privateKey, Hash) {
  */
 export async function verify(message, signature, publicKey, Curve, Hash) {
     let { R, s } = signature
-    const m = Buffer.concat(message, R) 
+
+    const m = concat(message, R)
     const h = (await Hash.hash(m)).toBigInt()
 
     const S = Curve.G.multiply(s)
-
     R = Curve.decompress(R)
     publicKey = Curve.decompress(publicKey)
-    return publicKey.multiply(h).add(R).equals(S)
 
+    return publicKey.multiply(h).add(R).equals(S)
 }
+
+
