@@ -1,6 +1,10 @@
 import { instantiateField } from '../../../finite-field-js/src/finite-field.js'
 import { CurvePoint } from '../elliptic.js'
 
+/**
+ * The prime modulus of Secp256k1's finite field.
+ * @type {BigInt} - The field modulus.
+ */
 export const secp256k1_p = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F');
 
 /**
@@ -53,7 +57,7 @@ export class Secp256k1 extends CurvePoint {
 }
 
 
-// TODO: Create curve point factory to generate class from more simple config files 
+// TODO: Create curve point factory to generate class from more simple configuration files 
 // containing only (p, order, a, b, G.x, G.y) per curve
 
 
