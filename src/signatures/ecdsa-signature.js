@@ -63,3 +63,6 @@ export async function verify(message, signature, publicKey, Curve, Hash) {
     // 5 - Calculate the signature validation result by comparing whether r' == r
     return r1.equals(r)
 }
+
+
+

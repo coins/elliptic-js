@@ -1,4 +1,6 @@
 import { SignatureDER } from './signature-DER.js'
+// import { Buffer } from '../../../buffer-js/buffer.js'
+
 describe('Signature DER (distinguished encoding rules)', function() {
 
     it('can encode and decode a signature', async function() {
@@ -6,6 +8,13 @@ describe('Signature DER (distinguished encoding rules)', function() {
    		const decoded = SignatureDER.fromHex(encodedExample)
    		const encoded = decoded.toHex()
    		expect(encoded).toBe(encodedExample)
+
+
+
+   		// console.log( new SignatureDER(
+   		// 	Buffer.fromBigInt(66622713665624427733710315200720396955896638749566533714623508373930515555288n), 
+   		// 	Buffer.fromBigInt(68653793658067006591589941737427614138567411446828702337612173227483835203372n)
+   		// ) )
     })
 
 })

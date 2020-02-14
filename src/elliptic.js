@@ -97,11 +97,7 @@ export class CurvePoint {
     }
 
     isEven() {
-        const x = this.x;
-        const a = this.constructor.a
-        const b = this.constructor.b
-        const isEven = this.y.n !== x.pow(3n).add(x.mul(a)).add(b).sqrt().n
-        return isEven
+        return !(this.y.n % 2n)
     }
 
     /**
@@ -112,7 +108,7 @@ export class CurvePoint {
      * @return {Buffer}
      */
     compress() {
-        const isEven = this.isEven() ? '02' : '01'
+        const isEven = this.isEven() ? '02' : '03'
         return Buffer.fromHex(isEven + this.x.toHex())
     }
 
@@ -155,8 +151,8 @@ export class CurvePoint {
 function parseOrientationByte(compressed) {
     const orientation = compressed.slice(0, 1)[0]
     switch (orientation) {
-        case 1:
-            return false
+        case 3:
+            return true
         case 2:
             return false
         default:
