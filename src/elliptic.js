@@ -1,3 +1,5 @@
+// TODO: annotate all class fields 
+
 import { Buffer } from '../../buffer-js/buffer.js'
 // Abstract group of elliptic curve points
 export class CurvePoint {

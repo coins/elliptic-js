@@ -1,14 +1,32 @@
-import { SerialBuffer, Uint8 } from '../../../buffer-js/buffer.js'
+import { SerialBuffer, Uint8, toBigInt, fromBigInt } from '../../../buffer-js/buffer.js'
+
+
 /**
- * DER encoding for signatures
+ * 
+ * DER encoding for ECC signatures
  * @see https://bitcoin.stackexchange.com/questions/77191/what-is-the-maximum-size-of-a-der-encoded-ecdsa-signature
+ * @see https://github.com/libbitcoin/libbitcoin-system/wiki/Sighash-and-TX-Signing
  */
 export class SignatureDER extends SerialBuffer {
 
     constructor(rValue, sValue) {
         super()
-        this.rValue = rValue
-        this.sValue = sValue
+        this.rValue = rValue // TODO: represent as BigInt instead of byte array
+        this.sValue = sValue // TODO: represent as BigInt instead of byte array
+    }
+
+    static fromBigInts(r, s) {
+        r = fromBigInt(r)
+        s = fromBigInt(s)
+        return new SignatureDER(r, s)
+    }
+
+    get s() {
+        return toBigInt(this.sValue)
+    }
+
+    get r() {
+        return toBigInt(this.rValue)
     }
 
     /**
@@ -30,13 +48,15 @@ export class SignatureDER extends SerialBuffer {
         writer.writeByte(2) // integerElement2
         writer.writeByte(this.sValue.byteLength) // element2Length
         writer.writeBytes(this.sValue)
+        
+        writer.writeByte(1) // SigHashFlag // TODO: actually read it!
     }
 
     /**
      * @override
      */
     byteLength() {
-        return this.rValue.byteLength + this.sValue.byteLength + 4 + 2
+        return this.rValue.byteLength + this.sValue.byteLength + 4 + 2 + 1
     }
 
     /**
@@ -52,6 +72,8 @@ export class SignatureDER extends SerialBuffer {
         const integerElement2 = Uint8.read(reader)
         const elementLength2 = Uint8.read(reader)
         const sValue = reader.readBytes(elementLength2)
+        
+        Uint8.read(reader) // SigHashFlag // TODO: actually read it!
 
         return new SignatureDER(rValue, sValue)
     }

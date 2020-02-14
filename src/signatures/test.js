@@ -26,3 +26,4 @@ describe('The function "generateRandomNonce"', function() {
     })
 
 })
+

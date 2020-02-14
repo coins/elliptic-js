@@ -14,7 +14,7 @@ export const secp256k1_p = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 export const FQ = instantiateField(secp256k1_p);
 
 /**
- * The group of points on curve Secp256k1 over FQ
+ * The group of points on curve Secp256k1 over FQ.
  */
 export class Secp256k1 extends CurvePoint {
 
@@ -57,8 +57,8 @@ export class Secp256k1 extends CurvePoint {
 }
 
 
-// TODO: Create curve point factory to generate class from more simple configuration files 
-// containing only (p, order, a, b, G.x, G.y) per curve
+// TODO: Create curve point factory to generate class from more simple configuration files. 
+// containing only the six value (p, order, a, b, G.x, G.y) per curve.
 
 
 

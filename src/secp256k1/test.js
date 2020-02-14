@@ -3,10 +3,10 @@
  * @see https://bitcoin.stackexchange.com/questions/50980/test-r-s-values-for-signature-generation
  */
 import { Secp256k1 } from '../secp256k1/secp256k1.js';
+import { SHA256d } from '../../../hash-js/hash.js';
 import * as Schnorr from '../signatures/schnorr-signature.js';
 import * as ECDSA from '../signatures/ecdsa-signature.js';
 import { Buffer } from '../../../buffer-js/buffer.js';
-import { SHA256d } from '../../../hash-js/hash.js';
 
 describe('Secp256k1', function() {
 

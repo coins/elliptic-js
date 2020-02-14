@@ -1,8 +1,12 @@
 import { concat, toBigInt } from '../../../buffer-js/buffer.js'
 import { mod_inv } from '../../../numbers-js/numbers.js'
 import { generateRandomNonce } from './nonce-generation.js'
+import { SignatureDER } from '../signature-DER/signature-DER.js'
+import { Secp256k1 } from '../secp256k1/secp256k1.js';
+import { SHA256d } from '../../../hash-js/hash.js';
 
 /**
+ * 
  * Sign a message with a private key.
  * 
  * @param {Uint8Array} message - The message.
@@ -13,8 +17,9 @@ import { generateRandomNonce } from './nonce-generation.js'
  * @see https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm
  * @see https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages
  * @see https://delfr.com/bitcoin/bitcoin-ecdsa-signature
+ * 
  */
-export async function sign(message, privateKey, Curve, Hash, generateNonce = generateRandomNonce) {
+export async function sign(message, privateKey, Curve = Secp256k1, Hash = SHA256d, generateNonce = generateRandomNonce) {
     // 1 - Calculate the message hash, using a cryptographic hash function
     const h = (await Hash.hash(message)).toBigInt()
 
@@ -30,21 +35,23 @@ export async function sign(message, privateKey, Curve, Hash, generateNonce = gen
     const x = privateKey
     const s = (k_inv * (h + r * privateKey)) % Curve.order
 
-    // 5 - Return the signature { r, s }
-    return { r, s }
+    // 5 - Return the signature { r, s } ( in DER encoding )
+    return SignatureDER.fromBigInts(r, s)
 }
 
 /**
+ * 
  * Verify a public key's signature for message.
  * 
  * @param {Uint8Array} message - The message.
  * @param {ArrayBuffer} signature - The signature.
  * @param {Uint8Array} publicKey - The public key.
  * @return {ArrayBuffer} - The signature.
+ * 
  */
-export async function verify(message, signature, publicKey, Curve, Hash) {
+export async function verify(message, signature, publicKey, Curve = Secp256k1, Hash = SHA256d) {
     // 0 - Prepare the inputs
-    let { r, s } = signature
+    const { r, s } = signature
     publicKey = Curve.decompress(publicKey)
 
     // 1 - Calculate the message hash
@@ -63,6 +70,4 @@ export async function verify(message, signature, publicKey, Curve, Hash) {
     // 5 - Calculate the signature validation result by comparing whether r' == r
     return r1.equals(r)
 }
-
-
 
