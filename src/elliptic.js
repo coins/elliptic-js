@@ -145,6 +145,11 @@ export class CurvePoint {
         return this.prototype.constructor
     }
 
+    /**
+     * Compute a public key from a private key
+     * 
+     * @return {Buffer}
+     */
     static publicKey(privateKey) {
         return this.G.multiply(privateKey).compress()
     }
