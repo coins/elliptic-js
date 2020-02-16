@@ -7,6 +7,7 @@ import { SHA256d } from '../../../hash-js/hash.js';
 import * as Schnorr from '../signatures/schnorr-signature.js';
 import * as ECDSA from '../signatures/ecdsa-signature.js';
 import { Buffer } from '../../../buffer-js/buffer.js';
+import { SignatureDER } from '../signature-DER/signature-DER.js';
 
 describe('Secp256k1', function() {
 
@@ -67,6 +68,14 @@ describe('Secp256k1', function() {
             expect(signature.s).toBe(104547365282402277427930334588853961202488080074579832666060404000093909658466n)
         })        
 
+
+        it('can verify a DER encoded signature', async function() {
+            const message = Buffer.fromHex('0100000001449d45bbbfe7fc93bbe649bb7b6106b248a15da5dbd6fdc9bdfc7efede83235e010000001976a914a235bdde3bb2c326f291d9c281fdc3fe1e956fe088acffffffff014062b007000000001976a914f86f0bc0a2232970ccdf4569815db500f126836188ac0000000001000000')
+            const signature = SignatureDER.fromHex('3045022100e15a8ead9013d1de55e71f195c9dc613483f07c8a0692a2144ffa90506436822022062bc9466b9e1941037fc23e1cfadf24c8833f96942beb8f4340df60d506f784b012101')
+            const publicKey = Buffer.fromHex('03969a4ac9b1521cfae44a929a614193b0467a20e0a15973cae9ba1efb9627d830')
+            const result = await ECDSA.verify(message, signature, publicKey, Secp256k1, SHA256d)
+            expect(result).toBeTrue()
+        })
     })
 
     describe('Schnorr Signatures', function() {

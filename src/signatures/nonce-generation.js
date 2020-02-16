@@ -8,8 +8,8 @@ import { concat, fromBigInt, toBigInt, randomBytes } from '../../../buffer-js/bu
  */
 export async function generateRandomNonce(Curve) {
     let nonce = toBigInt(randomBytes(32))
-    // The nonce must be a field element
-    while (nonce > Curve.FieldElement.order) {
+    // The nonce must be an element of the scalar field 
+    while (nonce > Curve.order) {
         // If it is too big, we generate another one
         nonce = toBigInt(randomBytes(32))
     }

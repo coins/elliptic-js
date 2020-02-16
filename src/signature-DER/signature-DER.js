@@ -1,11 +1,20 @@
 import { SerialBuffer, Uint8, toBigInt, fromBigInt } from '../../../buffer-js/buffer.js'
+import { Secp256k1 } from '../secp256k1/secp256k1.js'
 
 
 /**
  * 
  * Class for DER encoded ECC signatures.
+ * @see https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#der-encoding
+ * @see https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki#der-encoding-reference
  * @see https://bitcoin.stackexchange.com/questions/77191/what-is-the-maximum-size-of-a-der-encoded-ecdsa-signature
  * @see https://github.com/libbitcoin/libbitcoin-system/wiki/Sighash-and-TX-Signing
+ *
+ * 
+ * Encoding scheme: 
+ *     
+ *     `0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S] [sighash-type]`
+ * 
  */
 export class SignatureDER extends SerialBuffer {
 
@@ -30,6 +39,12 @@ export class SignatureDER extends SerialBuffer {
         super()
         this.rValue = rValue
         this.sValue = sValue
+
+        // Check for low S values in signatures.
+        // @see https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#low-s-values-in-signatures
+        if (this.s > Secp256k1.order / 2n) {
+            this.sValue = fromBigInt(Secp256k1.order - this.s)
+        }
     }
 
     /** 
@@ -72,15 +87,15 @@ export class SignatureDER extends SerialBuffer {
         const sequenceLength = new Uint8(this.rValue.byteLength + this.sValue.byteLength + 4)
         sequenceLength.write(writer)
 
-        // marker for r value
-        writer.writeByte(2)
+        // marker for the r value
+        writer.writeByte(0x02)
         // length of the r value
         writer.writeByte(this.rValue.byteLength)
         // the r value
         writer.writeBytes(this.rValue)
 
-        // marker for s value
-        writer.writeByte(2)
+        // marker for the s value
+        writer.writeByte(0x02)
         // length of the s value
         writer.writeByte(this.sValue.byteLength)
         // the s value
@@ -125,8 +140,8 @@ export class SignatureDER extends SerialBuffer {
             1 byte - marker for s value
             1 byte - length of the s value
             --------------------------
-            6 bytes
+            6 byte - total overhead
          */
-        return this.rValue.byteLength + this.sValue.byteLength + 6
+        return 6 + this.rValue.byteLength + this.sValue.byteLength
     }
 }

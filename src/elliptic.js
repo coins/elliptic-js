@@ -1,36 +1,61 @@
-// TODO: annotate all class fields 
-
 import { Buffer } from '../../buffer-js/buffer.js'
-// Abstract group of elliptic curve points
+
+/** 
+ * Abstract group of elliptic curve points.
+ */
 export class CurvePoint {
 
+    /**
+     * @param  {BigInt} x - The x-coordinate.
+     * @param  {BigInt} y - The y-coordinate.
+     * @param  {Boolean} isIdentity - Is true for the neutral element.
+     */
     constructor(x, y, isIdentity = false) {
-        if (x === undefined) { // Return the default point aka the generator
-            this.P = this.constructor.G.P;
-        } else if (isIdentity) {
+        if (isIdentity) {
             this._isIdentity = true
         } else {
             this.P = [x, y]
         }
     }
 
+    /**
+     * The x-coordinate of this point.
+     * @return {BigInt}
+     */
     get x() {
         return this.P[0]
     }
 
+    /**
+     * The y-coordinate of this point.
+     * @return {BigInt}
+     */
     get y() {
         return this.P[1]
     }
 
+    /**
+     * Check if this Point is the neutral element.
+     * @return {Boolean}
+     */
     isIdentity() {
         return this._isIdentity || false
     }
 
+    /**
+     * The neutral element of this group.
+     * @return {CurvePoint}
+     */
     static identity() {
         return new this.prototype.constructor(null, null, true);
     }
 
-    // Check that a point is on the curve defined by y**2 == x**3 + x*a + b
+    /**
+     * Check that this point is on the curve 
+     * defined by y**2 == x**3 + x*a + b
+     * 
+     * @return {Boolean}
+     */
     isWellDefined() {
         if (this.isIdentity())
             return true
@@ -39,7 +64,10 @@ export class CurvePoint {
         return y.pow(2n).sub(x.pow(3n)).sub(x.mul(a)).equals(b)
     }
 
-    // Elliptic curve doubling
+    /** 
+     * Double this Point.
+     * @return {CurvePoint}
+     */
     double() {
         const [x, y] = this.P;
         const a = this.constructor.a || 0
@@ -50,9 +78,9 @@ export class CurvePoint {
     }
 
     /**
-     * Add an other point to this one.
-     * @param {CurvePoint} other - The other point
-     * @return {CurvePoint} - The sum of the two points
+     * Add a curve point to this one.
+     * @param {CurvePoint} other - The other point.
+     * @return {CurvePoint} - The sum of the two points.
      */
     add(other) {
         if (this.isIdentity())
@@ -72,14 +100,22 @@ export class CurvePoint {
         return new this.constructor(newx, newy)
     }
 
-    // Convert P => -P
+    /**
+     * Compute the additive inverse of this element.
+     * @return {CurvePoint}
+     */
     neg() {
         if (this.isIdentity())
             return this
         return new this.constructor(this.x, this.y.neg())
     }
 
-    // Elliptic curve point multiplication
+    /**
+     * Multiply this point by a scalar.
+     * 
+     * @param  {BigInt} n - The scalar to multiply this point by.
+     * @return {CurvePoint}
+     */
     multiply(n) {
         n = BigInt(n)
         if (this.isIdentity())
@@ -94,10 +130,19 @@ export class CurvePoint {
             return this.double().multiply(n / 2n).add(this)
     }
 
+    /** 
+     * Checks if another CurvePoint is equal to this. 
+     * @param  {CurvePoint}
+     * @return {boolean}
+     */
     equals(other) {
+        if (!other instanceof CurvePoint) return false
         return this.x.equals(other.x) && this.y.equals(other.y)
     }
 
+    /** 
+     * @return {Boolean}
+     */
     isEven() {
         return !(this.y.n % 2n)
     }
@@ -114,6 +159,11 @@ export class CurvePoint {
         return Buffer.fromHex(isEven + this.x.toHex())
     }
 
+    /** 
+     * Decompress a compressed CurvePoint.
+     * @param  {Uint8Array} compressed - The compressed curve point.
+     * @return {CurvePoint}
+     */
     static decompress(compressed) {
         const isEven = parseOrientationByte(compressed)
         const x_int = compressed.slice(1).toBigInt()
@@ -127,27 +177,44 @@ export class CurvePoint {
         return this.CURVE.fromPoint(x, y)
     }
 
+    /**
+     * @param  {BigInt}
+     * @param  {BigInt}
+     * @return {CurvePoint}
+     */
     static fromPoint(x, y) {
         x = new this.CURVE.FieldElement(x)
         y = new this.CURVE.FieldElement(y)
         return new this.CURVE(x, y)
     }
 
+    /** 
+     * The underlying field element.
+     * @return {FieldElement}
+     */
     static get FieldElement() {
         throw 'Error: abstract method!';
     }
 
+
+    /** 
+     * The order of this group of curve points.
+     * @return {BigInt}
+     */
     static get order() {
         throw 'Error: abstract method!';
     }
 
+    /**
+     * Helper method for the dynamic type of this class.
+     * @return {CurvePoint}
+     */
     static get CURVE() {
         return this.prototype.constructor
     }
 
     /**
      * Compute a public key from a private key
-     * 
      * @return {Buffer}
      */
     static publicKey(privateKey) {
@@ -155,6 +222,11 @@ export class CurvePoint {
     }
 }
 
+/**
+ * Parse the orientation byte of a compressed public key.
+ * @param  {Uint8Array}
+ * @return {Boolean}
+ */
 function parseOrientationByte(compressed) {
     const orientation = compressed.slice(0, 1)[0]
     switch (orientation) {
