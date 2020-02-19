@@ -139,7 +139,7 @@ export class SignatureDER extends SerialBuffer {
             1 byte - length of the r value
             1 byte - marker for s value
             1 byte - length of the s value
-            --------------------------
+            ------------------------------
             6 byte - total overhead
          */
         return 6 + this.rValue.byteLength + this.sValue.byteLength
