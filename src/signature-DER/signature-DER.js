@@ -22,13 +22,13 @@ export class SignatureDER extends SerialBuffer {
      * The r-value of the signature.
      * @type {Uint8Array}
      */
-    rValue
+    // rValue
 
     /**
      * The s-value of the signature.
      * @type {Uint8Array}
      */
-    sValue
+    // sValue
 
     /** 
      * Convert a pair of Uint8Arrays to a DER encoded Signature.
