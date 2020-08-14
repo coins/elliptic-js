@@ -33,7 +33,7 @@ describe('Secp256k1', function() {
                 "0x01",
                 "0xbde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441"
             );
-            expect(P.isWellDefined()).toBeTrue();
+            expect(P.isWellDefined()).toBeTrue()
         })
 
         it('can be compressed and decompressed', function() {

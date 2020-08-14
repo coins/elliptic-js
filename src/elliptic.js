@@ -39,7 +39,7 @@ export class CurvePoint {
      * @return {Boolean}
      */
     isIdentity() {
-        return this._isIdentity || false
+        return !!this._isIdentity
     }
 
     /**

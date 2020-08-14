@@ -7,6 +7,7 @@ import { concat, fromBigInt, toBigInt, randomBytes } from '../../../buffer-js/bu
  * @return {BigInt} - A random nonce.
  */
 export async function generateRandomNonce(Curve) {
+    // TODO: replace this function with randomBigInt from bigint-math.js
     let nonce = toBigInt(randomBytes(32))
     // The nonce must be an element of the scalar field 
     while (nonce > Curve.order) {
@@ -26,6 +27,7 @@ export async function generateRandomNonce(Curve) {
  * @see https://tools.ietf.org/html/rfc6979#section-3.2
  */
 export async function generateNonceRFC6979(message, privateKey, hmac = hmac_sha256) {
+    console.warn('Caution! RFC6979 not implemented properly.')
     const nonce = await hmac(fromBigInt(privateKey), message)
     return toBigInt(nonce)
 }
